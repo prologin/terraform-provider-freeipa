@@ -165,7 +165,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		options["krbpasswordexpiration"] = d.Get("krbpasswordexpiration").(string)
 	}
 	if d.HasChange("mail") {
-		options["mail"] = d.Get("mail").(string)
+		options["mail"] = d.Get("mail").([]interface{})
 	}
 
 	if d.HasChangeExcept("uid") {
