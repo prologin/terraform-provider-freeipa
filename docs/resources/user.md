@@ -43,10 +43,12 @@ resource "freeipa_user" "john_doe" {
 
 ### Optional
 
+- `homedirectory` (String) Home directory
+If not specified, the default home directory will be used.
 - `krbpasswordexpiration` (String) Password expiration date (in RFC3339 format)
 If not specified, the password will be immediately expired. This follows the default behavior of the API.
 - `mail` (List of String) Email addresses
-If not specified, no email will be set. Note that this DOES NOT follows the API default behavior (that would have been to create <UID>@<REALM> email by default).
+If not specified, no email will be set. Note that this DOES NOT follows the API default behavior (that would have been to create UID@REALM email by default).
 
 ### Read-Only
 

@@ -7,7 +7,8 @@ type User struct {
 	KrbPasswordExpiration []struct {
 		DateTime IPATime `json:"__datetime__"`
 	} `json:"krbpasswordexpiration"` // Password expiration
-	Mail []string `json:"mail"` // Email
+	Mail          []string `json:"mail"`          // Email
+	HomeDirectory []string `json:"homedirectory"` // Home directory
 }
 
 func (c *APIClient) UserAdd(uid string, givenname string, sn string, options JSON) (*User, error) {

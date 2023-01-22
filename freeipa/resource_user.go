@@ -47,7 +47,7 @@ func schemaUser() map[string]*schema.Schema {
 			ValidateDiagFunc: validation.ToDiagFunc(validation.IsRFC3339Time),
 		},
 		"mail": {
-			Description: "Email addresses\nIf not specified, no email will be set. Note that this DOES NOT follows the API default behavior (that would have been to create <UID>@<REALM> email by default).",
+			Description: "Email addresses\nIf not specified, no email will be set. Note that this DOES NOT follows the API default behavior (that would have been to create UID@REALM email by default).",
 			Type:        schema.TypeList,
 			Optional:    true,
 			Computed:    true,
@@ -55,6 +55,12 @@ func schemaUser() map[string]*schema.Schema {
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringMatch(regexp.MustCompile(`(?i)^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`), "must be a valid email address")),
 			},
+		},
+		"homedirectory": {
+			Description: "Home directory\nIf not specified, the default home directory will be used.",
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
 		},
 	}
 }
@@ -102,19 +108,33 @@ func flattenUser(user *api.User) JSON {
 		flat["mail"] = make([]string, 0)
 	}
 
+	if len(user.HomeDirectory) > 0 {
+		flat["homedirectory"] = user.HomeDirectory[0]
+	} else {
+		flat["homedirectory"] = ""
+	}
+
 	return flat
 }
 
 func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*api.APIClient)
+
+	options := JSON{
+		"userpassword":          d.Get("password").(string),
+		"krbpasswordexpiration": d.Get("krbpasswordexpiration").(string),
+		"mail":                  d.Get("mail").([]interface{}),
+	}
+	homedir := d.Get("homedirectory").(string)
+	if homedir != "" {
+		options["homedirectory"] = homedir
+	}
+
 	user, err := client.UserAdd(d.Get("uid").(string),
 		d.Get("givenname").(string),
 		d.Get("sn").(string),
-		JSON{
-			"userpassword":          d.Get("password").(string),
-			"krbpasswordexpiration": d.Get("krbpasswordexpiration").(string),
-			"mail":                  d.Get("mail").([]interface{}),
-		})
+		options,
+	)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -166,6 +186,9 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	if d.HasChange("mail") {
 		options["mail"] = d.Get("mail").([]interface{})
+	}
+	if d.HasChange("homedirectory") {
+		options["homedirectory"] = d.Get("homedirectory").(string)
 	}
 
 	if d.HasChangeExcept("uid") {
