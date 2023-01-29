@@ -14,11 +14,15 @@ import (
 func schemaGroupMembership() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"group": {
-			Description:      "Group name (CN)",
-			Type:             schema.TypeString,
-			Required:         true,
-			ForceNew:         true,
-			ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsNotWhiteSpace),
+			Description: "Group name (CN)",
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+			ValidateDiagFunc: validation.ToDiagFunc(validation.All(
+				validation.StringIsNotWhiteSpace,
+				StringContainsNoUpperLetter,
+				StringIsNotOnlyDigits,
+			)),
 		},
 		"member": {
 			Description:      "Member identifier",

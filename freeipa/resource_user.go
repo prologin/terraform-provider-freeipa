@@ -14,11 +14,15 @@ import (
 func schemaUser() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"uid": {
-			Description:      "User UID (login)",
-			Type:             schema.TypeString,
-			ForceNew:         true,
-			Required:         true,
-			ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsNotWhiteSpace),
+			Description: "User UID (login)",
+			Type:        schema.TypeString,
+			ForceNew:    true,
+			Required:    true,
+			ValidateDiagFunc: validation.ToDiagFunc(validation.All(
+				validation.StringIsNotWhiteSpace,
+				StringContainsNoUpperLetter,
+				StringIsNotOnlyDigits,
+			)),
 		},
 		"givenname": {
 			Description:      "First name",

@@ -13,11 +13,15 @@ import (
 func schemaGroup() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"cn": {
-			Description:      "Group name",
-			Type:             schema.TypeString,
-			ForceNew:         true,
-			Required:         true,
-			ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsNotWhiteSpace),
+			Description: "Group name",
+			Type:        schema.TypeString,
+			ForceNew:    true,
+			Required:    true,
+			ValidateDiagFunc: validation.ToDiagFunc(validation.All(
+				validation.StringIsNotWhiteSpace,
+				StringContainsNoUpperLetter,
+				StringIsNotOnlyDigits,
+			)),
 		},
 		"description": {
 			Description: "First name",
