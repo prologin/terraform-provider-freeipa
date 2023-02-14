@@ -2,7 +2,6 @@ package freeipa
 
 import (
 	"context"
-	"regexp"
 
 	api "terraform-provider-freeipa/freeipa/api"
 
@@ -56,8 +55,7 @@ func schemaUser() map[string]*schema.Schema {
 			Optional:    true,
 			Computed:    true,
 			Elem: &schema.Schema{
-				Type:             schema.TypeString,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringMatch(regexp.MustCompile(`(?i)^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`), "must be a valid email address")),
+				Type: schema.TypeString,
 			},
 		},
 		"homedirectory": {
